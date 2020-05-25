@@ -1,5 +1,6 @@
 const file = require("./file.js");
 const _ = require("lodash");
+const os = require("os");
 
 const readIniFileAsync = async function(fileName) {
   return await file.readFileAsync(fileName, {encoding: "utf8"});
@@ -69,6 +70,21 @@ const setEntry = function(ini, sectionName, key, value) {
   section[key] = value;
 }
 
+const saveToFile = async function(ini, path) {
+  const contentStrings = [];
+
+  _.each(ini, (entries, header) => {
+    contentStrings.push(`[${header}]`);
+
+    _.each(entries, (value, key) => {
+      contentStrings.push(`${key}=${value}`);
+    });
+  });
+
+  const result = await file.writeFileAsync(path, contentStrings.join(os.EOL), "utf8");
+  return result && result.written;
+}
+
 module.exports = {
   iniFile,
   containsSection,
@@ -76,5 +92,6 @@ module.exports = {
   getSection,
   getEntry,
   addSection,
-  setEntry
+  setEntry,
+  saveToFile
 };
